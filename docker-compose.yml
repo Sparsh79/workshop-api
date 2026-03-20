@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  workshop-api:
+    build: .
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+      - "50051:50051"
+    environment:
+      - NODE_ENV=development
+      - JWT_SECRET=workshop-secret-2024
+      - GRPC_TLS=false
+    volumes:
+      - ./certs:/app/certs

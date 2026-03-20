@@ -1,0 +1,32 @@
+{
+  "name": "workshop-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run start:rest\" \"npm run start:graphql\" \"npm run start:grpc\"",
+    "start:rest": "node src/rest/server.js",
+    "start:graphql": "node src/graphql/server.js",
+    "start:grpc": "node src/grpc/server.js",
+    "dev": "concurrently \"nodemon src/rest/server.js\" \"nodemon src/graphql/server.js\" \"nodemon src/grpc/server.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@apollo/server": "^5.4.0",
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.0",
+    "@grpc/reflection": "^1.0.4",
+    "bcryptjs": "^3.0.3",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "graphql": "^16.13.1",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.3",
+    "uuid": "^13.0.0"
+  }
+}

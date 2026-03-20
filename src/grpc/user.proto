@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  // Unary
+  rpc GetUser (GetUserRequest) returns (User);
+
+  // Server Streaming
+  rpc ListUsers (ListUsersRequest) returns (stream User);
+
+  // Client Streaming
+  rpc CreateUsers (stream CreateUserRequest) returns (CreateUsersResponse);
+
+  // Bidirectional Streaming
+  rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
+  string department = 5;
+  bool is_active = 6;
+  string avatar = 7;
+  string created_at = 8;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message ListUsersRequest {
+  string department = 1;
+  int32 limit = 2;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+  string department = 4;
+}
+
+message CreateUsersResponse {
+  int32 created_count = 1;
+  repeated string ids = 2;
+}
+
+message ChatMessage {
+  string sender = 1;
+  string text = 2;
+  string timestamp = 3;
+}
