@@ -13,6 +13,7 @@ const app = express();
 const PORT = process.env.PORT_REST || 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Health & Version
 app.get('/health', (req, res) => {

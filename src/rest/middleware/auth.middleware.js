@@ -1,18 +1,8 @@
-const jwt = require('jsonwebtoken');
 const { getStore } = require('../../data/seed');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'workshop-secret-2024';
-
-// In-memory token blacklist
-const tokenBlacklist = new Set();
-
-function addToBlacklist(token) {
-  tokenBlacklist.add(token);
-}
-
-function isBlacklisted(token) {
-  return tokenBlacklist.has(token);
-}
+const {
+  revokeAccessToken,
+  verifyAccessToken,
+} = require('../utils/token.utils');
 
 function verifyJWT(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -20,16 +10,13 @@ function verifyJWT(req, res, next) {
     return next({ status: 401, message: 'Missing or invalid Authorization header' });
   }
   const token = authHeader.slice(7);
-  if (isBlacklisted(token)) {
-    return next({ status: 401, message: 'Token has been revoked' });
-  }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyAccessToken(token);
     req.user = decoded;
     req.token = token;
     next();
   } catch (err) {
-    next({ status: 401, message: 'Invalid or expired token' });
+    next({ status: 401, message: err.message === 'Token has been revoked' ? err.message : 'Invalid or expired token' });
   }
 }
 
@@ -68,4 +55,4 @@ function requireRole(role) {
   };
 }
 
-module.exports = { verifyJWT, verifyApiKey, verifyBearerOrApiKey, requireRole, addToBlacklist, isBlacklisted };
+module.exports = { verifyJWT, verifyApiKey, verifyBearerOrApiKey, requireRole, addToBlacklist: revokeAccessToken };
