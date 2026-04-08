@@ -1,0 +1,437 @@
+{
+	"info": {
+		"_postman_id": "7b9ff606-eda5-4331-96ea-ab9eb4d4842c",
+		"name": "REST Auth Demo",
+		"description": "Dedicated Postman collection for REST login, refresh, logout, and browser-based OAuth 2.0 demo flows.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46683056",
+		"_collection_link": "https://sparshbhardwaj-3142614.postman.co/workspace/Sparsh-Bhardwaj's-Workspace~c2f3b11c-0800-48d0-80d0-987c630462a8/collection/46683056-7b9ff606-eda5-4331-96ea-ab9eb4d4842c?action=share&source=collection_link&creator=46683056"
+	},
+	"item": [
+		{
+			"name": "JWT Login Flow",
+			"item": [
+				{
+					"name": "POST /auth/login (JSON body)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const r = pm.response.json();",
+									"pm.collectionVariables.set('accessToken', r.accessToken);",
+									"pm.collectionVariables.set('refreshToken', r.refreshToken);",
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Has access token', () => pm.expect(r.accessToken).to.be.a('string'));",
+									"pm.test('Has refresh token', () => pm.expect(r.refreshToken).to.be.a('string'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Workshop@123\"\n}"
+						},
+						"url": {
+							"raw": "{{restBase}}/auth/login",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/login (Basic Auth)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Has access token', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "alice@example.com",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "Workshop@123",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{restBase}}/auth/login",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users/me (JWT Bearer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Returns current user', () => pm.expect(pm.response.json().email).to.be.a('string'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{restBase}}/users/me",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"const r = pm.response.json();",
+									"pm.collectionVariables.set('accessToken', r.accessToken);",
+									"pm.collectionVariables.set('refreshToken', r.refreshToken);",
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Has rotated access token', () => pm.expect(r.accessToken).to.be.a('string'));",
+									"pm.test('Has rotated refresh token', () => pm.expect(r.refreshToken).to.be.a('string'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{restBase}}/auth/refresh",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Logout message returned', () => pm.expect(pm.response.json().message).to.include('Logged out'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{restBase}}/auth/logout",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OAuth 2.0 Browser Redirect",
+			"item": [
+				{
+					"name": "GET /oauth/authorize (Preview Consent Page)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('Consent page rendered', () => pm.expect(pm.response.text()).to.include('OAuth 2.0 Demo Consent'));"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{restBase}}/oauth/authorize?client_id={{oauthClientId}}&response_type=code&redirect_uri={{oauthRedirectUri}}&scope={{oauthScope}}&state={{oauthState}}&code_challenge={{oauthCodeChallenge}}&code_challenge_method={{oauthCodeChallengeMethod}}",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "{{oauthClientId}}"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{oauthRedirectUri}}"
+								},
+								{
+									"key": "scope",
+									"value": "{{oauthScope}}"
+								},
+								{
+									"key": "state",
+									"value": "{{oauthState}}"
+								},
+								{
+									"key": "code_challenge",
+									"value": "{{oauthCodeChallenge}}"
+								},
+								{
+									"key": "code_challenge_method",
+									"value": "{{oauthCodeChallengeMethod}}"
+								}
+							]
+						},
+						"description": "This previews the consent page only. The actual browser redirect demo is handled by the OAuth 2.0 helper on the next request."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /users/me (Use Postman OAuth 2.0 Helper)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 200', () => pm.response.to.have.status(200));",
+									"pm.test('OAuth-authenticated user returned', () => pm.expect(pm.response.json().email).to.be.a('string'));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "useBrowser",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "challengeAlgorithm",
+									"value": "plain",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code_with_pkce",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "https://oauth.pstmn.io/v1/browser-callback",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:3000/oauth/authorize",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "http://localhost:3000/oauth/token",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "postman-public",
+									"type": "string"
+								},
+								{
+									"key": "callbackURL",
+									"value": "https://oauth.pstmn.io/v1/browser-callback",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "users.read openid profile",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "demo-state",
+									"type": "string"
+								},
+								{
+									"key": "usePkce",
+									"value": true,
+									"type": "boolean"
+								},
+								{
+									"key": "code_challenge_method",
+									"value": "plain",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{restBase}}/users/me",
+							"host": [
+								"{{restBase}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						},
+						"description": "Open the Authorization tab on this request and click `Get New Access Token`. Postman will launch the browser, show the demo consent screen, redirect back to the callback URL, exchange the code, and then call `/users/me` with the OAuth access token."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "restBase",
+			"value": "http://localhost:3000"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "refreshToken",
+			"value": ""
+		},
+		{
+			"key": "oauthClientId",
+			"value": "postman-public"
+		},
+		{
+			"key": "oauthRedirectUri",
+			"value": "https://oauth.pstmn.io/v1/browser-callback"
+		},
+		{
+			"key": "oauthScope",
+			"value": "users.read openid profile"
+		},
+		{
+			"key": "oauthState",
+			"value": "demo-state"
+		},
+		{
+			"key": "oauthCodeVerifier",
+			"value": "abc123"
+		},
+		{
+			"key": "oauthCodeChallenge",
+			"value": "abc123"
+		},
+		{
+			"key": "oauthCodeChallengeMethod",
+			"value": "plain"
+		}
+	]
+}

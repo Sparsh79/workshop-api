@@ -1,25 +1,16 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { getStore } = require('../../data/seed');
 const { verifyJWT, addToBlacklist } = require('../middleware/auth.middleware');
+const {
+  generateAuthTokens,
+  issueAccessToken,
+  issueRefreshToken,
+  revokeRefreshToken,
+  rotateRefreshToken,
+} = require('../utils/token.utils');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'workshop-secret-2024';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-
-function generateTokens(user) {
-  const payload = { id: user.id, name: user.name, email: user.email, role: user.role };
-  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN });
-  return { accessToken, refreshToken };
-}
-
-function safeUser(user) {
-  const { password, ...rest } = user;
-  return rest;
-}
 
 // POST /auth/login
 router.post('/login', async (req, res, next) => {
@@ -54,7 +45,7 @@ router.post('/login', async (req, res, next) => {
       return next({ status: 401, message: 'Invalid credentials' });
     }
 
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = generateAuthTokens(user);
     res.json({
       accessToken,
       refreshToken,
@@ -67,6 +58,9 @@ router.post('/login', async (req, res, next) => {
 
 // POST /auth/logout
 router.post('/logout', verifyJWT, (req, res) => {
+  if (req.body.refreshToken) {
+    revokeRefreshToken(req.body.refreshToken);
+  }
   addToBlacklist(req.token);
   res.json({ message: 'Logged out successfully' });
 });
@@ -78,10 +72,17 @@ router.post('/refresh', (req, res, next) => {
     return next({ status: 400, message: 'refreshToken is required' });
   }
   try {
-    const decoded = jwt.verify(refreshToken, JWT_SECRET);
-    const payload = { id: decoded.id, name: decoded.name, email: decoded.email, role: decoded.role };
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-    res.json({ accessToken });
+    const decoded = rotateRefreshToken(refreshToken);
+    const user = {
+      id: decoded.id,
+      name: decoded.name,
+      email: decoded.email,
+      role: decoded.role,
+    };
+    const tokenExtras = decoded.scope ? { scope: decoded.scope } : {};
+    const accessToken = issueAccessToken(user, tokenExtras);
+    const nextRefreshToken = issueRefreshToken(user, tokenExtras);
+    res.json({ accessToken, refreshToken: nextRefreshToken });
   } catch (err) {
     next({ status: 401, message: 'Invalid or expired refresh token' });
   }

@@ -230,14 +230,17 @@ curl -X POST http://localhost:3000/auth/refresh \
 
 **Response:**
 ```json
-{ "accessToken": "<new-jwt>" }
+{
+  "accessToken": "<new-jwt>",
+  "refreshToken": "<rotated-refresh-token>"
+}
 ```
 
 ---
 
 #### `POST /auth/logout`
 
-Invalidates the current access token (added to an in-memory blacklist).
+Invalidates the current access token. You can also provide a `refreshToken` in the JSON body to revoke that refresh token during logout.
 
 ```bash
 curl -X POST http://localhost:3000/auth/logout \
@@ -253,20 +256,29 @@ curl -X POST http://localhost:3000/auth/logout \
 
 ### OAuth Mock Endpoints
 
-A lightweight mock of the OAuth 2.0 Authorization Code flow.
+A browser-based OAuth 2.0 Authorization Code demo flow for Postman workshops. `GET /oauth/authorize` now renders a consent page and redirects back to the client callback with `code` and `state`.
 
 #### `GET /oauth/authorize`
 
 ```bash
-curl "http://localhost:3000/oauth/authorize?client_id=postman-client&response_type=code&redirect_uri=http://localhost"
+open "http://localhost:3000/oauth/authorize?client_id=postman-public&response_type=code&redirect_uri=https://oauth.pstmn.io/v1/callback&scope=users.read%20openid%20profile&state=demo-state"
 ```
 
-**Response:**
-```json
-{ "code": "482910", "message": "Use this code in POST /oauth/token" }
+The browser shows a demo consent screen. After approval, it redirects to:
+```text
+https://oauth.pstmn.io/v1/callback?code=<authorization-code>&state=demo-state
 ```
 
 > Codes expire after **5 minutes**.
+
+Supported demo clients:
+- `postman-public` for Postman with PKCE and no client secret
+- `postman-confidential` for a classic client secret demo (`client_secret` defaults to `postman-secret`)
+
+Allowed callback URIs:
+- `https://oauth.pstmn.io/v1/callback`
+- `https://oauth.pstmn.io/v1/browser-callback`
+- `http://localhost:3000/callback`
 
 ---
 
@@ -277,15 +289,22 @@ curl -X POST http://localhost:3000/oauth/token \
   -H "Content-Type: application/json" \
   -d '{
     "grant_type": "authorization_code",
-    "code": "482910",
-    "client_id": "postman-client",
-    "redirect_uri": "http://localhost"
+    "code": "<authorization-code>",
+    "client_id": "postman-public",
+    "redirect_uri": "https://oauth.pstmn.io/v1/callback",
+    "code_verifier": "<pkce-code-verifier>"
   }'
 ```
 
 **Response:**
 ```json
-{ "accessToken": "<jwt>", "token_type": "Bearer", "expires_in": 3600 }
+{
+  "access_token": "<jwt>",
+  "refresh_token": "<jwt>",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "users.read openid profile"
+}
 ```
 
 ---
