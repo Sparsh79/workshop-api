@@ -4,6 +4,8 @@ const { seedStore, resetStore, getStore } = require('../data/seed');
 const authRoutes = require('./routes/auth.routes');
 const usersRoutes = require('./routes/users.routes');
 const oauthRoutes = require('./routes/oauth.routes');
+const cookieRoutes = require('./routes/cookie.routes');
+const cookieMiddleware = require('./middleware/cookie.middleware');
 const errorMiddleware = require('./middleware/error.middleware');
 const { verifyJWT, requireRole } = require('./middleware/auth.middleware');
 
@@ -31,10 +33,15 @@ app.post('/reset', verifyJWT, requireRole('admin'), async (req, res, next) => {
   }
 });
 
+// Apply middleware
+cookieMiddleware.applyMiddleware(app);
+
 // Routes
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
 app.use('/oauth', oauthRoutes);
+app.use('/cookies', cookieRoutes);
+
 
 // Error handler
 app.use(errorMiddleware);
