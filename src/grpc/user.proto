@@ -14,6 +14,12 @@ service UserService {
 
   // Bidirectional Streaming
   rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+
+  // Login
+  rpc Login (LoginRequest) returns (LoginResponse);
+
+  // Get User Auth
+  rpc GetUserAuth (GetUserAuthRequest) returns (GetUserAuthResponse);
 }
 
 message User {
@@ -52,4 +58,25 @@ message ChatMessage {
   string sender = 1;
   string text = 2;
   string timestamp = 3;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message GetUserAuthRequest {
+  string token = 1;
+}
+
+message GetUserAuthResponse {
+  string id = 1;
+  string role = 2;
+  string department = 3;
+  string name = 4;
+  string email = 5;
 }
