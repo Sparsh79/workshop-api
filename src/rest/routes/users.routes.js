@@ -142,4 +142,55 @@ router.delete('/:id', verifyJWT, requireRole('admin'), (req, res, next) => {
   res.status(204).send();
 });
 
+// FORM-DATA (File Upload + Fields)
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+router.post( '/upload-profile', verifyJWT,upload.single('avatar'),(req, res, next) => {
+    const name = req.body?.name;
+    const errors = [];
+
+    if (!name) errors.push('name is required');
+    if (!req.file) errors.push('avatar file is required');
+
+    if (errors.length) {
+      return next({
+        status: 422,
+        message: 'Validation failed',
+        details: errors
+      });
+    }
+
+    res.status(201).json({
+      message: 'File uploaded successfully',
+      name,
+      file: req.file
+    });
+  }
+);
+
+// x-www-form-urlencoded
+// POST /send-message
+router.post('/send-message', (req, res, next) => {
+  const { name, email, message } = req.body;
+
+  const errors = [];
+  if (!name) errors.push('name is required');
+  if (!email) errors.push('email is required');
+  if (!message) errors.push('message is required');
+
+  if (errors.length) {
+    return next({
+      status: 422,
+      message: 'Validation failed',
+      details: errors
+    });
+  }
+
+  res.json({
+    message: 'Message sent successfully',
+    data: { name, email, message }
+  });
+});
+
 module.exports = router;
