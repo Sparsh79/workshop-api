@@ -319,6 +319,11 @@
             "type": "oauth2",
             "oauth2": [
               {
+                "key": "clientId",
+                "value": "",
+                "type": "string"
+              },
+              {
                 "key": "tokenType",
                 "value": "Bearer",
                 "type": "string"
@@ -346,11 +351,6 @@
               {
                 "key": "scope",
                 "value": "users.read",
-                "type": "string"
-              },
-              {
-                "key": "clientId",
-                "value": "postman-public",
                 "type": "string"
               },
               {
