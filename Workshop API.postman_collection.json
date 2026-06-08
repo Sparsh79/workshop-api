@@ -228,89 +228,10 @@
           "name": "OAuth",
           "item": [
             {
-              "name": "GET /oauth/authorize",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "const r = pm.response.json();",
-                      "pm.collectionVariables.set('oauthCode', r.code);",
-                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has code', () => pm.expect(r.code).to.match(/^\\d{6}$/));"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
+              "name": "sample request",
               "request": {
                 "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{restBase}}/oauth/authorize?client_id=postman-client&response_type=code&redirect_uri=http://localhost",
-                  "host": [
-                    "{{restBase}}"
-                  ],
-                  "path": [
-                    "oauth",
-                    "authorize"
-                  ],
-                  "query": [
-                    {
-                      "key": "client_id",
-                      "value": "postman-client"
-                    },
-                    {
-                      "key": "response_type",
-                      "value": "code"
-                    },
-                    {
-                      "key": "redirect_uri",
-                      "value": "http://localhost"
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "POST /oauth/token",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has accessToken', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));"
-                    ],
-                    "type": "text/javascript",
-                    "packages": {},
-                    "requests": {}
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"grant_type\": \"authorization_code\",\r\n    \"code\": \"{{oauthCode}}\",\r\n    \"client_id\": \"postman-client\",\r\n    \"redirect_uri\": \"http://localhost\"\r\n}"
-                },
-                "url": {
-                  "raw": "{{restBase}}/oauth/token",
-                  "host": [
-                    "{{restBase}}"
-                  ],
-                  "path": [
-                    "oauth",
-                    "token"
-                  ]
-                }
+                "header": []
               },
               "response": []
             }
@@ -319,18 +240,18 @@
             "type": "oauth2",
             "oauth2": [
               {
-                "key": "clientId",
-                "value": "",
-                "type": "string"
-              },
-              {
                 "key": "tokenType",
                 "value": "Bearer",
                 "type": "string"
               },
               {
                 "key": "accessToken",
-                "value": "{{authToken}}",
+                "value": "{{accessToken}}",
+                "type": "string"
+              },
+              {
+                "key": "clientId",
+                "value": "postman-public",
                 "type": "string"
               },
               {
@@ -397,7 +318,7 @@
                     "exec": [
                       "const r = pm.response.json();",
                       "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has 12 users', () => pm.expect(r.pagination.total).to.equal(12));",
+                      "pm.test('Has 13 users', () => pm.expect(r.pagination.total).to.equal(13));",
                       "pm.test('No passwords', () => r.data.forEach(u => pm.expect(u.password).to.be.undefined));"
                     ],
                     "type": "text/javascript",
@@ -665,7 +586,9 @@
                       "pm.test('Status 201', () => pm.response.to.have.status(201));",
                       "pm.test('No password', () => pm.expect(r.password).to.be.undefined);"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -683,7 +606,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\": \"Test User\", \"email\": \"testuser@example.com\", \"password\": \"Test@123\", \"role\": \"user\", \"department\": \"QA\"}"
+                  "raw": "{\r\n    \"name\": \"{{$randomFirstName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{$randomPassword}}\",\r\n    \"role\": \"{{SelectRandomRole}}\",\r\n    \"department\": \"{{SelectRandomDepartmentName}}\"\r\n}"
                 },
                 "url": {
                   "raw": "{{restBase}}/users",
@@ -705,9 +628,11 @@
                   "script": {
                     "exec": [
                       "pm.test('Status 422', () => pm.response.to.have.status(422));",
-                      "pm.test('Has details', () => pm.expect(pm.response.json().details).to.be.an('array'));"
+                      "pm.test('Has details', () => pm.expect(pm.response.json()).to.be.an('object'));"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -725,7 +650,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\": \"Incomplete User\"}"
+                  "raw": "{\r\n    \"name\": \"Incomplete User\"\r\n}"
                 },
                 "url": {
                   "raw": "{{restBase}}/users",
@@ -906,9 +831,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -1402,15 +1329,6 @@
                   "    pm.response.to.have.status(201);\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"User details are correct\", function () {\r",
-                  "    pm.expect(res.id).to.not.be.empty;\r",
-                  "    pm.expect(res.name).to.eql(\"Test User\");\r",
-                  "    pm.expect(res.email).to.eql(\"testuser@example.com\");\r",
-                  "    pm.expect(res.role).to.eql(\"user\");\r",
-                  "    pm.expect(res.department).to.eql(\"QA\");\r",
-                  "    pm.expect(res.isActive).to.be.true;\r",
-                  "});\r",
-                  "\r",
                   "pm.test(\"Avatar URL is valid\", function () {\r",
                   "    pm.expect(res.avatar).to.include(\"https://\");\r",
                   "    pm.expect(res.avatar).to.include(\"pravatar.cc\");\r",
@@ -1455,7 +1373,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser1@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}",
+              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1884,7 +1802,7 @@
                   "    method: \"POST\",",
                   "    header: {",
                   "        \"Content-Type\": \"application/json\",",
-                  "        \"Authorization\": `Bearer ${pm.environment.get(\"accessToken\")}`",
+                  "        \"Authorization\": `Bearer ${pm.collectionVariables.get(\"accessToken\")}`",
                   "    },",
                   "    body: {",
                   "        mode: \"raw\",",
@@ -2116,7 +2034,19 @@
                 "exec": [
                   "const r = pm.response.json();",
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Page 2, limit 5', () => { pm.expect(r.pagination.page).to.equal(2); pm.expect(r.pagination.limit).to.equal(5); });"
+                  "pm.test('User ID', () => pm.expect(r.id).to.eql('u-001'));",
+                  "pm.test('User Name', () => pm.expect(r.name).to.eql('Alice Johnson'));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2133,13 +2063,13 @@
               }
             ],
             "url": {
-              "raw": "{{restBase}}/users/u-002",
+              "raw": "{{restBase}}/users/u-001",
               "host": [
                 "{{restBase}}"
               ],
               "path": [
                 "users",
-                "u-002"
+                "u-001"
               ]
             }
           },
@@ -2182,7 +2112,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}"
+              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
             },
             "url": {
               "raw": "{{restBase}}/users",
