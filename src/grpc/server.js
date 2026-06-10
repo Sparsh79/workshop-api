@@ -28,6 +28,8 @@ server.addService(userProto.UserService.service, {
   ListUsers: handlers.ListUsers,
   CreateUsers: handlers.CreateUsers,
   Chat: handlers.Chat,
+  Login: handlers.Login,
+  GetUserAuth: handlers.GetUserAuth
 });
 
 const reflection = new ReflectionService(packageDefinition);
