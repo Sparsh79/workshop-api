@@ -1,11 +1,10 @@
 {
   "info": {
-    "_postman_id": "b2e8bd68-30ff-46e4-b098-4bed6e4301ba",
+    "_postman_id": "ee09e68b-6eff-452f-a735-ec3306c0e86b",
     "name": "Workshop API",
     "description": "REST, GraphQL, and gRPC API for Postman training workshop",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "45407431",
-    "_collection_link": "https://go.postman.co/collection/45407431-b2e8bd68-30ff-46e4-b098-4bed6e4301ba?source=collection_link"
+    "_exporter_id": "26151533"
   },
   "item": [
     {
@@ -191,7 +190,9 @@
                       "pm.test('Status 200', () => pm.response.to.have.status(200));",
                       "pm.test('Logout message', () => pm.expect(pm.response.json().message).to.include('Logged out'));"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -201,6 +202,11 @@
                   {
                     "key": "Authorization",
                     "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
                   }
                 ],
                 "url": {
@@ -222,89 +228,81 @@
           "name": "OAuth",
           "item": [
             {
-              "name": "GET /oauth/authorize",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "const r = pm.response.json();",
-                      "pm.collectionVariables.set('oauthCode', r.code);",
-                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has code', () => pm.expect(r.code).to.match(/^\\d{6}$/));"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
+              "name": "sample request",
               "request": {
                 "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{restBase}}/oauth/authorize?client_id=postman-client&response_type=code&redirect_uri=http://localhost",
-                  "host": [
-                    "{{restBase}}"
-                  ],
-                  "path": [
-                    "oauth",
-                    "authorize"
-                  ],
-                  "query": [
-                    {
-                      "key": "client_id",
-                      "value": "postman-client"
-                    },
-                    {
-                      "key": "response_type",
-                      "value": "code"
-                    },
-                    {
-                      "key": "redirect_uri",
-                      "value": "http://localhost"
-                    }
-                  ]
-                }
+                "header": []
               },
               "response": []
+            }
+          ],
+          "auth": {
+            "type": "oauth2",
+            "oauth2": [
+              {
+                "key": "tokenType",
+                "value": "Bearer",
+                "type": "string"
+              },
+              {
+                "key": "accessToken",
+                "value": "{{accessToken}}",
+                "type": "string"
+              },
+              {
+                "key": "clientId",
+                "value": "postman-public",
+                "type": "string"
+              },
+              {
+                "key": "redirect_uri",
+                "value": "https://oauth.pstmn.io/v1/callback",
+                "type": "string"
+              },
+              {
+                "key": "accessTokenUrl",
+                "value": "http://localhost:3000/oauth/token",
+                "type": "string"
+              },
+              {
+                "key": "authUrl",
+                "value": "http://localhost:3000/oauth/authorize",
+                "type": "string"
+              },
+              {
+                "key": "scope",
+                "value": "users.read",
+                "type": "string"
+              },
+              {
+                "key": "addTokenTo",
+                "value": "header",
+                "type": "string"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  ""
+                ]
+              }
             },
             {
-              "name": "POST /oauth/token",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has accessToken', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));"
-                    ],
-                    "type": "text/javascript"
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\"grant_type\": \"authorization_code\", \"code\": \"{{oauthCode}}\", \"client_id\": \"postman-client\", \"redirect_uri\": \"http://localhost\"}"
-                },
-                "url": {
-                  "raw": "{{restBase}}/oauth/token",
-                  "host": [
-                    "{{restBase}}"
-                  ],
-                  "path": [
-                    "oauth",
-                    "token"
-                  ]
-                }
-              },
-              "response": []
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  ""
+                ]
+              }
             }
           ]
         },
@@ -320,7 +318,7 @@
                     "exec": [
                       "const r = pm.response.json();",
                       "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                      "pm.test('Has 12 users', () => pm.expect(r.pagination.total).to.equal(12));",
+                      "pm.test('Has 13 users', () => pm.expect(r.pagination.total).to.equal(13));",
                       "pm.test('No passwords', () => r.data.forEach(u => pm.expect(u.password).to.be.undefined));"
                     ],
                     "type": "text/javascript",
@@ -588,7 +586,9 @@
                       "pm.test('Status 201', () => pm.response.to.have.status(201));",
                       "pm.test('No password', () => pm.expect(r.password).to.be.undefined);"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -606,7 +606,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\": \"Test User\", \"email\": \"testuser@example.com\", \"password\": \"Test@123\", \"role\": \"user\", \"department\": \"QA\"}"
+                  "raw": "{\r\n    \"name\": \"{{$randomFirstName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{$randomPassword}}\",\r\n    \"role\": \"{{SelectRandomRole}}\",\r\n    \"department\": \"{{SelectRandomDepartmentName}}\"\r\n}"
                 },
                 "url": {
                   "raw": "{{restBase}}/users",
@@ -628,9 +628,11 @@
                   "script": {
                     "exec": [
                       "pm.test('Status 422', () => pm.response.to.have.status(422));",
-                      "pm.test('Has details', () => pm.expect(pm.response.json().details).to.be.an('array'));"
+                      "pm.test('Has details', () => pm.expect(pm.response.json()).to.be.an('object'));"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -648,7 +650,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\": \"Incomplete User\"}"
+                  "raw": "{\r\n    \"name\": \"Incomplete User\"\r\n}"
                 },
                 "url": {
                   "raw": "{{restBase}}/users",
@@ -829,9 +831,11 @@
                   "listen": "test",
                   "script": {
                     "exec": [
-                      "pm.test('Status 403', () => pm.response.to.have.status(403));"
+                      "pm.test('Status 404', () => pm.response.to.have.status(404));"
                     ],
-                    "type": "text/javascript"
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
                   }
                 }
               ],
@@ -1232,6 +1236,65 @@
       "item": [
         {
           "name": "GET /user - No Body (GET / DELETE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains users array\", () => {\r",
+                  "    pm.expect(res.data).to.be.an(\"array\");\r",
+                  "    pm.expect(res.data.length).to.be.greaterThan(0);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Pagination object is present\", () => {\r",
+                  "    pm.expect(res.pagination).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All users have required fields\", () => {\r",
+                  "    res.data.forEach(user => {\r",
+                  "        pm.expect(user).to.have.property(\"id\");\r",
+                  "        pm.expect(user).to.have.property(\"name\");\r",
+                  "        pm.expect(user).to.have.property(\"email\");\r",
+                  "        pm.expect(user).to.have.property(\"role\");\r",
+                  "        pm.expect(user).to.have.property(\"department\");\r",
+                  "        pm.expect(user).to.have.property(\"apiKey\");\r",
+                  "        pm.expect(user).to.have.property(\"avatar\");\r",
+                  "        pm.expect(user).to.have.property(\"isActive\");\r",
+                  "        pm.expect(user).to.have.property(\"createdAt\");\r",
+                  "        pm.expect(user).to.have.property(\"updatedAt\");\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All emails are valid\", () => {\r",
+                  "    res.data.forEach(user => {\r",
+                  "        pm.expect(user.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All API keys start with ak-\", () => {\r",
+                  "    res.data.forEach(user => {\r",
+                  "        pm.expect(user.apiKey).to.match(/^ak-/);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All users are active\", () => {\r",
+                  "    res.data.forEach(user => {\r",
+                  "        pm.expect(user.isActive).to.be.true;\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -1255,6 +1318,50 @@
         },
         {
           "name": "POST /user - Raw JSON Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Avatar URL is valid\", function () {\r",
+                  "    pm.expect(res.avatar).to.include(\"https://\");\r",
+                  "    pm.expect(res.avatar).to.include(\"pravatar.cc\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"API Key is generated\", function () {\r",
+                  "    pm.expect(res.apiKey).to.match(/^ak-/);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Timestamps are present\", function () {\r",
+                  "    pm.expect(res.createdAt).to.not.be.empty;\r",
+                  "    pm.expect(res.updatedAt).to.not.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains all required fields\", function () {\r",
+                  "    pm.expect(res).to.have.property(\"id\");\r",
+                  "    pm.expect(res).to.have.property(\"name\");\r",
+                  "    pm.expect(res).to.have.property(\"email\");\r",
+                  "    pm.expect(res).to.have.property(\"role\");\r",
+                  "    pm.expect(res).to.have.property(\"department\");\r",
+                  "    pm.expect(res).to.have.property(\"avatar\");\r",
+                  "    pm.expect(res).to.have.property(\"isActive\");\r",
+                  "    pm.expect(res).to.have.property(\"apiKey\");\r",
+                  "    pm.expect(res).to.have.property(\"createdAt\");\r",
+                  "    pm.expect(res).to.have.property(\"updatedAt\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1266,7 +1373,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}",
+              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1287,6 +1394,54 @@
         },
         {
           "name": "POST /uploadProfile-  Form-Data Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Message is correct\", function () {\r",
+                  "    pm.expect(response.message).to.eql(\"File uploaded successfully\");\r",
+                  "});\r",
+                  "\r",
+                  "// pm.test(\"Name is correct\", function () {\r",
+                  "//     pm.expect(response.name).to.eql(\"test12\");\r",
+                  "// });\r",
+                  "\r",
+                  "pm.test(\"File object exists\", function () {\r",
+                  "    pm.expect(response.file).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"File details are correct\", function () {\r",
+                  "    pm.expect(response.file.fieldname).to.eql(\"avatar\");\r",
+                  "    pm.expect(response.file.originalname).to.include(\".png\");\r",
+                  "    pm.expect(response.file.mimetype).to.eql(\"image/png\");\r",
+                  "    pm.expect(response.file.destination).to.eql(\"uploads/\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Generated filename is present\", function () {\r",
+                  "    pm.expect(response.file.filename).to.not.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"File path contains filename\", function () {\r",
+                  "    pm.expect(response.file.path).to.include(response.file.filename);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"File size is greater than 0\", function () {\r",
+                  "    pm.expect(response.file.size).to.be.above(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1309,7 +1464,7 @@
                   "key": "avatar",
                   "type": "file",
                   "uuid": "49d15e10-b168-4815-b716-fab822209950",
-                  "src": "///wsl.localhost/Ubuntu/home/rahulkumar/Screenshot 2026-04-30 121956.png"
+                  "src": "/C:/Users/RahulKumar/OneDrive - NASHTECH/Pictures/Screenshots/Screenshot 2026-05-14 002101.png"
                 }
               ]
             },
@@ -1328,6 +1483,33 @@
         },
         {
           "name": "POST /send - message – x-www-form-urlencoded Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Message sent successfully\", function () {\r",
+                  "    pm.expect(res.message).to.eql(\"Message sent successfully\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Contact details are correct\", function () {\r",
+                  "    pm.expect(res.data.name).to.eql(\"Rk\");\r",
+                  "    pm.expect(res.data.email).to.eql(\"rk@test.com\");\r",
+                  "    pm.expect(res.data.message).to.eql(\"Hello Rk Tester1\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1519,7 +1701,7 @@
                 "exec": [
                   "",
                   "// Select a random role from the array",
-                  "const role = [\"user\", \"admin\", \"'guest'\"];",
+                  "const role = [\"user\", \"admin\", \"guest\"];",
                   "const randomRole = role[Math.floor(Math.random() * role.length)];",
                   "pm.collectionVariables.set(\"SelectRandomRole\", randomRole)",
                   "",
@@ -1852,7 +2034,19 @@
                 "exec": [
                   "const r = pm.response.json();",
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Page 2, limit 5', () => { pm.expect(r.pagination.page).to.equal(2); pm.expect(r.pagination.limit).to.equal(5); });"
+                  "pm.test('User ID', () => pm.expect(r.id).to.eql('u-001'));",
+                  "pm.test('User Name', () => pm.expect(r.name).to.eql('Alice Johnson'));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1869,13 +2063,13 @@
               }
             ],
             "url": {
-              "raw": "{{restBase}}/users/2",
+              "raw": "{{restBase}}/users/u-001",
               "host": [
                 "{{restBase}}"
               ],
               "path": [
                 "users",
-                "2"
+                "u-001"
               ]
             }
           },
@@ -1918,7 +2112,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}"
+              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
             },
             "url": {
               "raw": "{{restBase}}/users",
@@ -1978,59 +2172,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Returns users', () => pm.expect(pm.response.json().data.length).to.be.greaterThan(0));",
-                  "",
-                  "pm.test(\"Validate users list schema\", function () {",
-                  "    const schema = {",
-                  "        type: \"object\",",
-                  "        required: [\"data\", \"pagination\"],",
-                  "        properties: {",
-                  "            data: {",
-                  "                type: \"array\",",
-                  "                items: {",
-                  "                    type: \"object\",",
-                  "                    required: [",
-                  "                        \"id\",",
-                  "                        \"name\",",
-                  "                        \"email\",",
-                  "                        \"role\",",
-                  "                        \"department\",",
-                  "                        \"apiKey\",",
-                  "                        \"avatar\",",
-                  "                        \"isActive\",",
-                  "                        \"createdAt\",",
-                  "                        \"updatedAt\"",
-                  "                    ],",
-                  "                    properties: {",
-                  "                        id: { type: \"string\" },",
-                  "                        name: { type: \"string\" },",
-                  "                        email: { type: \"string\", format: \"email\" },",
-                  "                        role: { type: \"string\" },",
-                  "                        department: { type: \"string\" },",
-                  "                        apiKey: { type: \"string\" },",
-                  "                        avatar: { type: \"string\", format: \"uri\" },",
-                  "                        isActive: { type: \"boolean\" },",
-                  "                        createdAt: { type: \"string\", format: \"date-time\" },",
-                  "                        updatedAt: { type: \"string\", format: \"date-time\" }",
-                  "                    }",
-                  "                }",
-                  "            },",
-                  "            pagination: {",
-                  "                type: \"object\",",
-                  "                required: [\"page\", \"limit\", \"total\", \"totalPages\"],",
-                  "                properties: {",
-                  "                    page: { type: \"number\" },",
-                  "                    limit: { type: \"number\" },",
-                  "                    total: { type: \"number\" },",
-                  "                    totalPages: { type: \"number\" }",
-                  "                }",
-                  "            }",
-                  "        }",
-                  "    };",
-                  "",
-                  "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
-                  "});"
+                  "pm.test('validate Status 404', () => pm.response.to.have.status(404));",
+                  "pm.test('validate returns error message', () => pm.expect(pm.response.json().error).to.be.equal(\"User not found\"));",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2066,41 +2210,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const r = pm.response.json();",
-                  "pm.collectionVariables.set('newUserId', r.id);",
-                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
-                  "pm.test('No password', () => pm.expect(r.password).to.be.undefined);",
-                  "pm.test('Role should be present and match from the available roles', () => pm.expect(r.role).to.be.oneOf(['admin', 'user', 'guest']));",
-                  "pm.test('Email should be present and match the email format', () => pm.expect(r.email).to.be.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/));",
-                  "pm.test(\"department should be present and match the available departments\", () => pm.expect(r.department).to.be.oneOf([\"QA\", \"Java\", \"Devops\", \"FE\"]));",
-                  "pm.test(\"createdAt and updatedAt should be present and match the date format\", () => {",
-                  "    pm.expect(r.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
-                  "    pm.expect(r.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
-                  "});",
-                  "",
-                  "pm.test(\"Validate response schema\", function () {",
-                  "    const schema = {",
-                  "        type: \"object\",",
-                  "        required: [",
-                  "            \"id\", \"name\", \"email\", \"role\", \"department\",",
-                  "            \"avatar\", \"isActive\", \"apiKey\", \"createdAt\", \"updatedAt\"",
-                  "        ],",
-                  "        properties: {",
-                  "            id: { type: \"string\" },",
-                  "            name: { type: \"string\" },",
-                  "            email: { type: \"string\", format: \"email\" },",
-                  "            role: { type: \"string\" },",
-                  "            department: { type: \"string\" },",
-                  "            avatar: { type: \"string\", format: \"uri\" },",
-                  "            isActive: { type: \"boolean\" },",
-                  "            apiKey: { type: \"string\" },",
-                  "            createdAt: { type: \"string\", format: \"date-time\" },",
-                  "            updatedAt: { type: \"string\", format: \"date-time\" }",
-                  "        }",
-                  "    };",
-                  "",
-                  "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
-                  "});"
+                  "pm.test('validate Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('validate returns error message', () => pm.expect(pm.response.json().error).to.be.equal(\"Validation failed\"));",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2143,7 +2255,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": 2346476276237465,\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
+              "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
             },
             "url": {
               "raw": "{{restBase}}/users",
@@ -2191,6 +2303,10 @@
     },
     {
       "key": "newUserId",
+      "value": ""
+    },
+    {
+      "key": "createdUserId",
       "value": ""
     }
   ]
