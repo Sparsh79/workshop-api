@@ -2,6 +2,8 @@ const grpc = require('@grpc/grpc-js');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const { getStore } = require('../data/seed');
+const jwt = require("jsonwebtoken");
+const SECRET = "my-secret";
 
 function toGrpcUser(user) {
   return {
@@ -88,4 +90,101 @@ function Chat(call) {
   call.on('end', () => call.end());
 }
 
-module.exports = { GetUser, ListUsers, CreateUsers, Chat };
+async function Login(call, callback) {
+  const { email, password } = call.request;
+
+  const { users } = getStore();
+  const user = users.find((u) => u.email === email);
+
+  // simple validation (demo)
+  if (email.includes("forced-internal-error")) {
+  return callback({
+    code: grpc.status.INTERNAL,
+    message: "Forced internal error"
+  });
+}
+
+  if (!user) {
+    return callback({
+      code: grpc.status.NOT_FOUND,
+      message: "User not found"
+    });
+  }
+  
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    return callback({
+      code: grpc.status.UNAUTHENTICATED,
+      message: "Invalid password"
+    });
+  }
+
+  // Generate token
+  const token = jwt.sign(
+    {
+      userId: user.id,
+      role: user.role,
+      email: user.email
+    },
+    SECRET,
+    { expiresIn: "1h" }
+  );
+
+  callback(null, { token });
+}
+
+function GetUserAuth(call, callback) {
+  const authHeader = call.metadata.get("authorization")[0];
+
+  const metadata = new grpc.Metadata();
+
+  metadata.add("x-request-id", "req-123");
+  metadata.add("x-server", "user-service");
+
+  call.sendMetadata(metadata);
+
+  if (!authHeader) {
+    return callback({
+      code: grpc.status.UNAUTHENTICATED,
+      message: "Missing token"
+    });
+  }
+
+  const token = authHeader.replace("Bearer ", "");
+
+  try {
+    const decoded = jwt.verify(token, SECRET);
+
+    const { users } = getStore(); 
+
+    const user = users.find(u => u.id === decoded.userId);
+
+    if (!user) {
+      return callback({
+        code: grpc.status.NOT_FOUND,
+        message: "User not found"
+      });
+    }
+
+    // Return user info without sensitive data
+    callback(null, {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department
+    });
+
+
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    return callback({
+      code: grpc.status.UNAUTHENTICATED,
+      message: "Invalid token"
+    });
+  }
+}
+
+
+module.exports = { GetUser, ListUsers, CreateUsers, Chat, Login, GetUserAuth };

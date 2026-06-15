@@ -2,7 +2,7 @@ const { gql } = require('graphql-tag');
 
 const typeDefs = gql`
   type User {
-    id: ID!
+    id: String!
     name: String!
     email: String!
     role: String!
@@ -29,15 +29,15 @@ const typeDefs = gql`
 
   type Query {
     users(department: String, role: String, page: Int, limit: Int): PaginatedUsers!
-    user(id: ID!): User
+    user(id: String!): User
     me: User
   }
 
   type Mutation {
     login(email: String!, password: String!): AuthPayload!
     createUser(name: String!, email: String!, password: String!, role: String!, department: String!): User!
-    updateUser(id: ID!, name: String, email: String, role: String, department: String, isActive: Boolean): User!
-    deleteUser(id: ID!): Boolean!
+    updateUser(id: String!, name: String, email: String, role: String, department: String, isActive: Boolean): User!
+    deleteUser(id: String!): Boolean!
     resetData: Boolean!
   }
 `;
