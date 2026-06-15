@@ -13,6 +13,7 @@ run-newman-tests:
 name: Postman Tests
 runs-on: ubuntu-latest
 
+```
 steps:
   - name: Checkout Code
     uses: actions/checkout@v4
@@ -20,35 +21,34 @@ steps:
   - name: Setup Node.js
     uses: actions/setup-node@v4
     with:
-      node-version: '18'
+      node-version: 18
 
-  - name: Install Project Dependencies
+  - name: Install Dependencies
     run: npm install
 
-  - name: Start Application Services
+  - name: Start Application
     run: |
       npm run start &
-      echo "Application starting in background..."
+      echo "Application started in background"
 
-  - name: Wait for API Health Check
+  - name: Wait for Application
     run: |
-      echo "Waiting for API to become available...
       for i in {1..30}; do
-        if curl -s http://localhost:3000/health > /dev/null; then
-          echo "API is up and running!"
+        if curl -f http://localhost:3000/health; then
+          echo "Application is ready"
           exit 0
         fi
-        echo "Attempt $i/30 - API not ready yet..."
+        echo "Waiting for application..."
         sleep 2
       done
 
-      echo "API failed to start within expected time."
+      echo "Application failed to start"
       exit 1
 
-  - name: Create Test Artifact Directory
+  - name: Create Report Directory
     run: mkdir -p testArtifacts
 
-  - name: Install Newman and HTML Reporter
+  - name: Install Newman
     run: |
       npm install -g newman
       npm install -g newman-reporter-htmlextra
@@ -59,9 +59,9 @@ steps:
         -r cli,htmlextra \
         --reporter-htmlextra-export testArtifacts/newman-report.html
 
-  - name: Upload Newman Report
+  - name: Upload Report
     uses: actions/upload-artifact@v4
     with:
       name: newman-test-report
       path: testArtifacts/newman-report.html
-      retention-days: 30
+```
