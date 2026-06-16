@@ -1,0 +1,65 @@
+name: Run Postman Tests
+
+permissions:
+  pull-requests: write
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-newman-tests:
+    name: Postman Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Start Application
+        run: |
+          npm run start &
+          echo "Application started in background"
+
+      - name: Wait for Application
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/health; then
+              echo "Application is ready"
+              exit 0
+            fi
+            echo "Waiting for application..."
+            sleep 2
+          done
+
+          echo "Application failed to start"
+          exit 1
+
+      - name: Create Report Directory
+        run: mkdir -p testArtifacts
+
+      - name: Install Newman
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      - name: Run Postman Collection
+        run: |
+          newman run "Workshop API.postman_collection.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export testArtifacts/newman-report.html
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-test-report
+          path: testArtifacts/newman-report.html
