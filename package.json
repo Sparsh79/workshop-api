@@ -30,6 +30,6 @@
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   }
 }
