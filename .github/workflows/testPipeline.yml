@@ -6,6 +6,26 @@ on:
       - main
       - feature/*
 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select Environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+
+      folder:
+        description: "Select Postman Folder"
+        required: true
+        type: choice
+        options:
+          - Basic Crud Operation
+          - Body Types Handling (JSON, Form, URL Encoded)
+          - Query Params & Path Variables
+
+
 jobs:
   run-newman-tests:
     name: Postman Tests
@@ -51,8 +71,19 @@ jobs:
           npm install -g newman-reporter-htmlextra
 
       - name: Run Postman Collection
+        if: github.event_name == 'push'
         run: |
           newman run "Workshop API.postman_collection.json" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export testArtifacts/newman-report.html || true
+
+      - name: Run Selected Folder (Manual Trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          newman run "Workshop API.postman_collection.json" \
+            -r cli,htmlextra \
+            --folder "${{ github.event.inputs.folder }}" \
+            -e "environments/${{ github.event.inputs.environment }}.postman_environment.json" \
             -r cli,htmlextra \
             --reporter-htmlextra-export testArtifacts/newman-report.html || true
 
