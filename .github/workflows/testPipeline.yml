@@ -1,6 +1,6 @@
 name: Run Postman Tests
 
-on:
+"on":
   push:
     branches:
       - main
