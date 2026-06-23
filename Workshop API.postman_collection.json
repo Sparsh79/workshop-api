@@ -248,7 +248,7 @@
               "script": {
                 "exec": [
                   "pm.sendRequest({",
-                  "    url: `${pm.collectionVariables.get(\"restBase\")}/users`,",
+                  "    url: `${pm.environment.get(\"restBase\")}/users`,",
                   "    method: \"POST\",",
                   "    header: {",
                   "        \"Content-Type\": \"application/json\",",
@@ -1452,6 +1452,26 @@
             "type": "oauth2",
             "oauth2": [
               {
+                "key": "accessTokenUrl",
+                "value": "{{accessTokenURL}}",
+                "type": "string"
+              },
+              {
+                "key": "clientId",
+                "value": "{{clientID}}",
+                "type": "string"
+              },
+              {
+                "key": "authUrl",
+                "value": "{{tokenAuthURL}}",
+                "type": "string"
+              },
+              {
+                "key": "redirect_uri",
+                "value": "{{tokenCallbackURL}}",
+                "type": "string"
+              },
+              {
                 "key": "tokenType",
                 "value": "Bearer",
                 "type": "string"
@@ -1459,26 +1479,6 @@
               {
                 "key": "accessToken",
                 "value": "{{accessToken}}",
-                "type": "string"
-              },
-              {
-                "key": "clientId",
-                "value": "postman-public",
-                "type": "string"
-              },
-              {
-                "key": "redirect_uri",
-                "value": "https://oauth.pstmn.io/v1/callback",
-                "type": "string"
-              },
-              {
-                "key": "accessTokenUrl",
-                "value": "http://localhost:3000/oauth/token",
-                "type": "string"
-              },
-              {
-                "key": "authUrl",
-                "value": "http://localhost:3000/oauth/authorize",
                 "type": "string"
               },
               {

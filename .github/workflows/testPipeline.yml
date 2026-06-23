@@ -18,9 +18,9 @@ name: Run Postman Tests
 
       folder:
         description: "Select Postman Folder"
-        required: true
         type: choice
         options:
+          - Full Collection
           - Basic Crud Operation
           - Body Types Handling (JSON, Form, URL Encoded)
           - Query Params & Path Variables
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
 
       - name: Install Dependencies
         run: npm install
@@ -74,18 +74,25 @@ jobs:
         if: github.event_name == 'push'
         run: |
           newman run "Workshop API.postman_collection.json" \
+            -e "dev.postman_environment.json" \
             -r cli,htmlextra \
             --reporter-htmlextra-export testArtifacts/newman-report.html || true
 
       - name: Run Selected Folder (Manual Trigger)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          newman run "Workshop API.postman_collection.json" \
-            -r cli,htmlextra \
-            --folder "${{ github.event.inputs.folder }}" \
-            -e "environments/${{ github.event.inputs.environment }}.postman_environment.json" \
-            -r cli,htmlextra \
-            --reporter-htmlextra-export testArtifacts/newman-report.html || true
+          if [ "${{ github.event.inputs.folder }}" = "Full Collection" ]; then
+            newman run "Workshop API.postman_collection.json" \
+              -e "${{ github.event.inputs.environment }}.postman_environment.json" \
+              -r cli,htmlextra \
+              --reporter-htmlextra-export testArtifacts/newman-report.html
+          else
+            newman run "Workshop API.postman_collection.json" \
+              --folder "${{ github.event.inputs.folder }}" \
+              -e "${{ github.event.inputs.environment }}.postman_environment.json" \
+              -r cli,htmlextra \
+              --reporter-htmlextra-export testArtifacts/newman-report.html
+          fi
 
       - name: Upload Report
         uses: actions/upload-artifact@v4
