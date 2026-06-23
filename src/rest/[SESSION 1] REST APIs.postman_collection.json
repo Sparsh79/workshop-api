@@ -1,0 +1,1121 @@
+{
+  "info": {
+    "_postman_id": "76dc755c-91b7-419b-965f-6234b6dd388c",
+    "name": "[SESSION 1] REST APIs",
+    "description": "REST, GraphQL, and gRPC API for Postman training workshop",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "28742616",
+    "_collection_link": "https://go.postman.co/collection/28742616-76dc755c-91b7-419b-965f-6234b6dd388c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Session 1 and 2: Basic APIs and Assertion",
+      "item": [
+        {
+          "name": "Basic Crud Operation and API Validation",
+          "item": [
+            {
+              "name": "GET_All_Available_Users",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Returns users', () => pm.expect(pm.response.json().data.length).to.be.greaterThan(0));",
+                      "",
+                      "pm.test(\"Validate users list schema\", function () {",
+                      "    const schema = {",
+                      "        type: \"object\",",
+                      "        required: [\"data\", \"pagination\"],",
+                      "        properties: {",
+                      "            data: {",
+                      "                type: \"array\",",
+                      "                items: {",
+                      "                    type: \"object\",",
+                      "                    required: [",
+                      "                        \"id\",",
+                      "                        \"name\",",
+                      "                        \"email\",",
+                      "                        \"role\",",
+                      "                        \"department\",",
+                      "                        \"apiKey\",",
+                      "                        \"avatar\",",
+                      "                        \"isActive\",",
+                      "                        \"createdAt\",",
+                      "                        \"updatedAt\"",
+                      "                    ],",
+                      "                    properties: {",
+                      "                        id: { type: \"string\" },",
+                      "                        name: { type: \"string\" },",
+                      "                        email: { type: \"string\", format: \"email\" },",
+                      "                        role: { type: \"string\" },",
+                      "                        department: { type: \"string\" },",
+                      "                        apiKey: { type: \"string\" },",
+                      "                        avatar: { type: \"string\", format: \"uri\" },",
+                      "                        isActive: { type: \"boolean\" },",
+                      "                        createdAt: { type: \"string\", format: \"date-time\" },",
+                      "                        updatedAt: { type: \"string\", format: \"date-time\" }",
+                      "                    }",
+                      "                }",
+                      "            },",
+                      "            pagination: {",
+                      "                type: \"object\",",
+                      "                required: [\"page\", \"limit\", \"total\", \"totalPages\"],",
+                      "                properties: {",
+                      "                    page: { type: \"number\" },",
+                      "                    limit: { type: \"number\" },",
+                      "                    total: { type: \"number\" },",
+                      "                    totalPages: { type: \"number\" }",
+                      "                }",
+                      "            }",
+                      "        }",
+                      "    };",
+                      "",
+                      "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "ak-alice-001"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST_Create_New_User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.collectionVariables.set('newUserId', r.id);",
+                      "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                      "pm.test('No password', () => pm.expect(r.password).to.be.undefined);",
+                      "pm.test('Role should be present and match from the available roles', () => pm.expect(r.role).to.be.oneOf(['admin', 'user', 'guest']));",
+                      "pm.test('Email should be present and match the email format', () => pm.expect(r.email).to.be.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/));",
+                      "pm.test(\"department should be present and match the available departments\", () => pm.expect(r.department).to.be.oneOf([\"QA\", \"Java\", \"Devops\", \"FE\"]));",
+                      "pm.test(\"createdAt and updatedAt should be present and match the date format\", () => {",
+                      "    pm.expect(r.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "    pm.expect(r.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "});",
+                      "",
+                      "pm.test(\"Validate response schema\", function () {",
+                      "    const schema = {",
+                      "        type: \"object\",",
+                      "        required: [",
+                      "            \"id\", \"name\", \"email\", \"role\", \"department\",",
+                      "            \"avatar\", \"isActive\", \"apiKey\", \"createdAt\", \"updatedAt\"",
+                      "        ],",
+                      "        properties: {",
+                      "            id: { type: \"string\" },",
+                      "            name: { type: \"string\" },",
+                      "            email: { type: \"string\", format: \"email\" },",
+                      "            role: { type: \"string\" },",
+                      "            department: { type: \"string\" },",
+                      "            avatar: { type: \"string\", format: \"uri\" },",
+                      "            isActive: { type: \"boolean\" },",
+                      "            apiKey: { type: \"string\" },",
+                      "            createdAt: { type: \"string\", format: \"date-time\" },",
+                      "            updatedAt: { type: \"string\", format: \"date-time\" }",
+                      "        }",
+                      "    };",
+                      "",
+                      "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "",
+                      "// Select a random role from the array",
+                      "const role = [\"user\", \"admin\", \"'guest'\"];",
+                      "const randomRole = role[Math.floor(Math.random() * role.length)];",
+                      "pm.collectionVariables.set(\"SelectRandomRole\", randomRole)",
+                      "",
+                      "// Select random department from avaiable list",
+                      "const department = [\"QA\", \"Java\", \"Devops\", \"FE\"];",
+                      "const randomDepartment = department[Math.floor(Math.random() * department.length)];",
+                      "pm.collectionVariables.set(\"SelectRandomDepartmentName\", randomDepartment)",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "PUT_Update_Existing_User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200 for PUT request', () => pm.response.to.have.status(200));",
+                      "",
+                      "const r = pm.response.json();",
+                      "pm.test('No password', () => pm.expect(r.password).to.be.undefined);",
+                      "pm.test('Role should be moderator', () => pm.expect(r.role).to.be.equal(\"moderator\"));",
+                      "pm.test('Email should be present and match the email format', () => pm.expect(r.email).to.be.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/));",
+                      "pm.test(\"department should be Frontend\", () => pm.expect(r.department).to.be.equal(\"Frontend\"));",
+                      "pm.test(\"createdAt and updatedAt should be present and match the date format\", () => {",
+                      "    pm.expect(r.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "    pm.expect(r.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "});",
+                      "",
+                      "pm.test(\"Validate response schema\", function () {",
+                      "    const schema = {",
+                      "        type: \"object\",",
+                      "        required: [",
+                      "            \"id\", \"name\", \"email\", \"role\", \"department\",",
+                      "            \"avatar\", \"isActive\", \"apiKey\", \"createdAt\", \"updatedAt\"",
+                      "        ],",
+                      "        properties: {",
+                      "            id: { type: \"string\" },",
+                      "            name: { type: \"string\" },",
+                      "            email: { type: \"string\", format: \"email\" },",
+                      "            role: { type: \"string\" },",
+                      "            department: { type: \"string\" },",
+                      "            avatar: { type: \"string\", format: \"uri\" },",
+                      "            isActive: { type: \"boolean\" },",
+                      "            apiKey: { type: \"string\" },",
+                      "            createdAt: { type: \"string\", format: \"date-time\" },",
+                      "            updatedAt: { type: \"string\", format: \"date-time\" }",
+                      "        }",
+                      "    };",
+                      "",
+                      "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "pm.sendRequest({",
+                      "    url: `${pm.collectionVariables.get(\"restBase\")}/users`,",
+                      "    method: \"POST\",",
+                      "    header: {",
+                      "        \"Content-Type\": \"application/json\",",
+                      "        \"Authorization\": `Bearer ${pm.collectionVariables.get(\"accessToken\")}`",
+                      "    },",
+                      "    body: {",
+                      "        mode: \"raw\",",
+                      "        raw: JSON.stringify({",
+                      "            \"name\": \"name\",",
+                      "            \"email\": \"Email\",",
+                      "            \"password\": \"UpdatedPassword\",",
+                      "            \"role\": \"User\",",
+                      "            \"department\": \"Devops\"",
+                      "        })",
+                      "    }",
+                      "}, function (err, res) {",
+                      "    const json = res.json();",
+                      "    pm.test(\"status code should be 201 for POST User\", function () {",
+                      "        pm.expect(res.code).to.eql(201);",
+                      "    })",
+                      "    pm.collectionVariables.set(\"createdUserId\", json.id);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated User\",\n    \"email\": \"testuser@example.com\",\n    \"role\": \"moderator\",\n    \"department\": \"Frontend\",\n    \"isActive\": false\n}"
+                },
+                "url": {
+                  "raw": "{{restBase}}/users/{{createdUserId}}",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "{{createdUserId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "PATCH_Partial_Update_Existing_User_Detail",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Department updated', () => pm.expect(pm.response.json().department).to.equal('DevOps'));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"department\": \"DevOps\"}"
+                },
+                "url": {
+                  "raw": "{{restBase}}/users/{{newUserId}}",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "{{newUserId}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "DELETE_Existing_User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 204', () => pm.response.to.have.status(204));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users/{{newUserId}}",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "{{newUserId}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Query Params & Path Variables",
+          "item": [
+            {
+              "name": "GET /users (filter by department)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('All Backend', () => r.data.forEach(u => pm.expect(u.department).to.equal('Backend')));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users?department=Backend",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "department",
+                      "value": "Backend"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /users (pagination)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Page 2, limit 5', () => { pm.expect(r.pagination.page).to.equal(2); pm.expect(r.pagination.limit).to.equal(5); });"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users?page=2&limit=5",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "2"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /particular user",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Page 2, limit 5', () => { pm.expect(r.pagination.page).to.equal(2); pm.expect(r.pagination.limit).to.equal(5); });"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users/2",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Body Types Handling (JSON, Form, URL Encoded)",
+          "item": [
+            {
+              "name": "GET /user - No Body (GET / DELETE)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "ak-alice-001",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST /user - Raw JSON Requests",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST /uploadProfile-  Form-Data Requests",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "test12",
+                      "type": "text"
+                    },
+                    {
+                      "key": "avatar",
+                      "type": "file",
+                      "src": "/home/nashtech/Pictures/Screenshots/Screenshot from 2026-03-26 12-29-12.png"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{restBase}}/users/upload-profile",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "upload-profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST /send - message – x-www-form-urlencoded Requests",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "name",
+                      "value": "Rk",
+                      "type": "text"
+                    },
+                    {
+                      "key": "email",
+                      "value": "rk@test.com",
+                      "type": "text"
+                    },
+                    {
+                      "key": "message",
+                      "value": "Hello Rk Tester1",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{restBase}}/users/send-message",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "send-message"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Configure request headers",
+          "item": [
+            {
+              "name": "POST /users (create)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.collectionVariables.set('newUserId', r.id);",
+                      "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                      "pm.test('No password', () => pm.expect(r.password).to.be.undefined);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Test@123\",\n    \"role\": \"user\",\n    \"department\": \"QA\"\n}"
+                },
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET /users (API Key)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Returns users', () => pm.expect(pm.response.json().data.length).to.be.greaterThan(0));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "ak-alice-001"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "API Error Handling in Tests",
+          "item": [
+            {
+              "name": "GET_All_Available_Users_while_passing_invalid_or_non_existing_id",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Returns users', () => pm.expect(pm.response.json().data.length).to.be.greaterThan(0));",
+                      "",
+                      "pm.test(\"Validate users list schema\", function () {",
+                      "    const schema = {",
+                      "        type: \"object\",",
+                      "        required: [\"data\", \"pagination\"],",
+                      "        properties: {",
+                      "            data: {",
+                      "                type: \"array\",",
+                      "                items: {",
+                      "                    type: \"object\",",
+                      "                    required: [",
+                      "                        \"id\",",
+                      "                        \"name\",",
+                      "                        \"email\",",
+                      "                        \"role\",",
+                      "                        \"department\",",
+                      "                        \"apiKey\",",
+                      "                        \"avatar\",",
+                      "                        \"isActive\",",
+                      "                        \"createdAt\",",
+                      "                        \"updatedAt\"",
+                      "                    ],",
+                      "                    properties: {",
+                      "                        id: { type: \"string\" },",
+                      "                        name: { type: \"string\" },",
+                      "                        email: { type: \"string\", format: \"email\" },",
+                      "                        role: { type: \"string\" },",
+                      "                        department: { type: \"string\" },",
+                      "                        apiKey: { type: \"string\" },",
+                      "                        avatar: { type: \"string\", format: \"uri\" },",
+                      "                        isActive: { type: \"boolean\" },",
+                      "                        createdAt: { type: \"string\", format: \"date-time\" },",
+                      "                        updatedAt: { type: \"string\", format: \"date-time\" }",
+                      "                    }",
+                      "                }",
+                      "            },",
+                      "            pagination: {",
+                      "                type: \"object\",",
+                      "                required: [\"page\", \"limit\", \"total\", \"totalPages\"],",
+                      "                properties: {",
+                      "                    page: { type: \"number\" },",
+                      "                    limit: { type: \"number\" },",
+                      "                    total: { type: \"number\" },",
+                      "                    totalPages: { type: \"number\" }",
+                      "                }",
+                      "            }",
+                      "        }",
+                      "    };",
+                      "",
+                      "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-api-key",
+                    "value": "ak-alice-001"
+                  }
+                ],
+                "url": {
+                  "raw": "{{restBase}}/users/568989898",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users",
+                    "568989898"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST_Create_New_while_passing_wrong_data_type_on_email_field",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const r = pm.response.json();",
+                      "pm.collectionVariables.set('newUserId', r.id);",
+                      "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                      "pm.test('No password', () => pm.expect(r.password).to.be.undefined);",
+                      "pm.test('Role should be present and match from the available roles', () => pm.expect(r.role).to.be.oneOf(['admin', 'user', 'guest']));",
+                      "pm.test('Email should be present and match the email format', () => pm.expect(r.email).to.be.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/));",
+                      "pm.test(\"department should be present and match the available departments\", () => pm.expect(r.department).to.be.oneOf([\"QA\", \"Java\", \"Devops\", \"FE\"]));",
+                      "pm.test(\"createdAt and updatedAt should be present and match the date format\", () => {",
+                      "    pm.expect(r.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "    pm.expect(r.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}/);",
+                      "});",
+                      "",
+                      "pm.test(\"Validate response schema\", function () {",
+                      "    const schema = {",
+                      "        type: \"object\",",
+                      "        required: [",
+                      "            \"id\", \"name\", \"email\", \"role\", \"department\",",
+                      "            \"avatar\", \"isActive\", \"apiKey\", \"createdAt\", \"updatedAt\"",
+                      "        ],",
+                      "        properties: {",
+                      "            id: { type: \"string\" },",
+                      "            name: { type: \"string\" },",
+                      "            email: { type: \"string\", format: \"email\" },",
+                      "            role: { type: \"string\" },",
+                      "            department: { type: \"string\" },",
+                      "            avatar: { type: \"string\", format: \"uri\" },",
+                      "            isActive: { type: \"boolean\" },",
+                      "            apiKey: { type: \"string\" },",
+                      "            createdAt: { type: \"string\", format: \"date-time\" },",
+                      "            updatedAt: { type: \"string\", format: \"date-time\" }",
+                      "        }",
+                      "    };",
+                      "",
+                      "    pm.expect(pm.response.json()).to.have.jsonSchema(schema);",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "",
+                      "// Select a random role from the array",
+                      "const role = [\"user\", \"admin\", \"'guest'\"];",
+                      "const randomRole = role[Math.floor(Math.random() * role.length)];",
+                      "pm.collectionVariables.set(\"SelectRandomRole\", randomRole)",
+                      "",
+                      "// Select random department from avaiable list",
+                      "const department = [\"QA\", \"Java\", \"Devops\", \"FE\"];",
+                      "const randomDepartment = department[Math.floor(Math.random() * department.length)];",
+                      "pm.collectionVariables.set(\"SelectRandomDepartmentName\", randomDepartment)",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"{{$randomFirstName}}\",\n    \"email\": 2346476276237465,\n    \"password\": \"{{$randomPassword}}\",\n    \"role\": \"{{SelectRandomRole}}\",\n    \"department\": \"{{SelectRandomDepartmentName}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{restBase}}/users",
+                  "host": [
+                    "{{restBase}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Cookies",
+          "item": [
+            {
+              "name": "Basic Cookies",
+              "item": [
+                {
+                  "name": "Set Cookie",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{restBase}}/cookies/set-cookie",
+                      "host": [
+                        "{{restBase}}"
+                      ],
+                      "path": [
+                        "cookies",
+                        "set-cookie"
+                      ]
+                    },
+                    "description": "Generated from cURL: curl -i http://localhost:3000/set-cookie"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Get Cookie",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{restBase}}/cookies/get-cookie",
+                      "host": [
+                        "{{restBase}}"
+                      ],
+                      "path": [
+                        "cookies",
+                        "get-cookie"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Delete Cookie",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{restBase}}/cookies/delete-cookie",
+                      "host": [
+                        "{{restBase}}"
+                      ],
+                      "path": [
+                        "cookies",
+                        "delete-cookie"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "CSRF Cookies",
+              "item": [
+                {
+                  "name": "GET CSRF Cookie",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.collectionVariables.set(\"csrfToken\", pm.response.json().csrfToken);"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{restBase}}/cookies/csrf/token",
+                      "host": [
+                        "{{restBase}}"
+                      ],
+                      "path": [
+                        "cookies",
+                        "csrf",
+                        "token"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Set CSRF Cookie",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{csrfToken}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": []
+                    },
+                    "url": {
+                      "raw": "{{restBase}}/cookies/csrf/set-cookie",
+                      "host": [
+                        "{{restBase}}"
+                      ],
+                      "path": [
+                        "cookies",
+                        "csrf",
+                        "set-cookie"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "restBase",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "graphqlBase",
+      "value": "http://localhost:4000/graphql"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "oauthCode",
+      "value": ""
+    },
+    {
+      "key": "newUserId",
+      "value": ""
+    },
+    {
+      "key": "SelectRandomRole",
+      "value": ""
+    },
+    {
+      "key": "SelectRandomDepartmentName",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "createdUserId",
+      "value": ""
+    },
+    {
+      "key": "csrfToken",
+      "value": ""
+    }
+  ]
+}
